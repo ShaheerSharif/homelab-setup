@@ -1,0 +1,19 @@
+# Environment files
+.env*
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+
+# Documentation
+README.md
+
+# Docker files
+docker/
+
+# Secrets
+secrets/
