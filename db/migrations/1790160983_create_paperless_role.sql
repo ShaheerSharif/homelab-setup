@@ -1,0 +1,17 @@
+-- migrate:up
+CREATE ROLE paperless_user WITH LOGIN PASSWORD 'paperless' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+GRANT CONNECT ON DATABASE paperless TO paperless_user;
+GRANT USAGE ON SCHEMA public TO paperless_user;
+GRANT SELECT,
+    INSERT,
+    UPDATE,
+    DELETE ON ALL TABLES IN SCHEMA public TO paperless_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT SELECT,
+    INSERT,
+    UPDATE,
+    DELETE ON TABLES TO paperless_user;
+-- migrate:down
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public
+FROM paperless_user;
+DROP ROLE IF EXISTS paperless_user;
