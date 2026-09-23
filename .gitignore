@@ -5,3 +5,7 @@
 # Secrets
 secrets/*.conf
 !secrets/*.example.conf
+
+# Paperless
+paperless/consume/
+paperless/export/

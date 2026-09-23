@@ -1,0 +1,1 @@
+FROM docker.io/apache/tika:3.3.1.0

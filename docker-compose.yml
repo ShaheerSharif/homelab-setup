@@ -1,6 +1,8 @@
 name: homelab
 
 services:
+
+  # DB services
   postgres:
     build:
       context: .
@@ -21,6 +23,7 @@ services:
       - internal-net
       - external-net
 
+  # Migration services
   migrate:
     build:
       context: .
@@ -41,6 +44,7 @@ services:
       postgres:
         condition: service_healthy
 
+  # Cache/Broker services
   valkey:
     build:
       context: .
@@ -56,6 +60,7 @@ services:
       - internal-net
       - external-net
 
+  # Web server
   nginx:
     build:
       context: .
@@ -76,11 +81,64 @@ services:
     networks:
       - internal-net
       - external-net
+    depends_on:
+      paperless:
+        condition: service_started
+        required: false
+
+  # Utility services
+  gotenberg:
+    build:
+      context: .
+      dockerfile: docker/utils/gotenberg.dockerfile
+    restart: unless-stopped
+
+  tika:
+    build:
+      context: .
+      dockerfile: docker/utils/apache-tika.dockerfile
+    restart: unless-stopped
+
+  # Services
+  paperless:
+    build:
+      context: .
+      dockerfile: docker/services/paperless-ngx.dockerfile
+    restart: unless-stopped
+    ports:
+      - "10004:8000"
+    environment:
+      - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
+      - PAPERLESS_REDIS_FILE=/run/secrets/valkey_url
+    secrets:
+      - paperless_secret_key
+      - valkey_url
+    volumes:
+      - paperless_data:/usr/src/paperless/data
+      - paperless_media:/usr/src/paperless/media
+      - ./paperless/export:/usr/src/paperless/export
+      - ./paperless/consume:/usr/src/paperless/consume
+    networks:
+      - internal-net
+      - external-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      valkey:
+        condition: service_healthy
+      gotenberg:
+        condition: service_started
+      tika:
+        condition: service_started
 
 
 volumes:
   postgres_data:
   valkey_data:
+  paperless_data:
+  paperless_media:
 
 
 networks:
@@ -97,3 +155,7 @@ secrets:
     environment: POSTGRES_PASSWORD
   valkey_password:
     environment: VALKEY_PASSWORD
+  valkey_url:
+    environment: VALKEY_URL
+  paperless_secret_key:
+    environment: PAPERLESS_SECRET_KEY
