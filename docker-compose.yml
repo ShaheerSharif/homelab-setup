@@ -25,12 +25,10 @@ services:
     build:
       context: .
       dockerfile: docker/db/dbmate.dockerfile
-      args:
-        - POSTGRES_USER=${POSTGRES_USER}
-        - POSTGRES_DB=${POSTGRES_DB:-postgres}
     restart: "no"
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
       - DBMATE_MIGRATIONS_DIR=/db/migrations
       - DBMATE_NO_DUMP_SCHEMA=true
     secrets:
