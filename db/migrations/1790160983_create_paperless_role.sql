@@ -1,6 +1,6 @@
 -- migrate:up
 CREATE ROLE paperless_user WITH LOGIN PASSWORD 'paperless' NOSUPERUSER NOCREATEDB NOCREATEROLE;
-GRANT CONNECT ON DATABASE paperless TO paperless_user;
+GRANT CONNECT ON DATABASE paperless_db TO paperless_user;
 GRANT USAGE ON SCHEMA public TO paperless_user;
 GRANT SELECT,
     INSERT,
