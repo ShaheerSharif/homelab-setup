@@ -18,6 +18,7 @@ services:
     secrets:
       - postgres_password
     volumes:
+      - ./config/postgresql:/etc/postgresql:ro
       - postgres_data:/var/lib/postgresql
     networks:
       - internal-net
@@ -55,6 +56,7 @@ services:
     secrets:
       - valkey_password
     volumes:
+      - ./config/valkey/valkey.conf:/usr/local/valkey/valkey.conf:ro
       - valkey_data:/data
     networks:
       - internal-net
@@ -71,6 +73,14 @@ services:
     restart: unless-stopped
     environment:
       - NGINX_HOST=${NGINX_HOST}
+    volumes:
+      - ./config/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./config/nginx/snippets:/etc/nginx/snippets:ro
+      - ./config/nginx/certs:/etc/nginx/certs:ro
+      - ./config/nginx/vhost.d:/etc/nginx/vhost.d:ro
+      - ./config/nginx/htpasswd:/etc/nginx/htpasswd:ro
+
+      - ./html:/usr/share/nginx/html:ro
     networks:
       - internal-net
       - external-net
