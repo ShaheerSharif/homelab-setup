@@ -1,0 +1,26 @@
+-- migrate:up
+CREATE ROLE npm_user WITH LOGIN PASSWORD 'npmpass' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+-- Ownership de do — ye sabse important step hai
+ALTER DATABASE npm_db OWNER TO npm_user;
+ALTER SCHEMA public OWNER TO npm_user;
+-- Jo objects pehle se maujood hain unka ownership bhi transfer karo
+-- (agar koi existing tables/sequences already kisi aur user ke under hain)
+GRANT ALL PRIVILEGES ON DATABASE npm_db TO npm_user;
+GRANT ALL PRIVILEGES ON SCHEMA public TO npm_user;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO npm_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO npm_user;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO npm_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT ALL PRIVILEGES ON TABLES TO npm_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT ALL PRIVILEGES ON SEQUENCES TO npm_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT ALL PRIVILEGES ON FUNCTIONS TO npm_user;
+-- migrate:down
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public
+FROM npm_user;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public
+FROM npm_user;
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public
+FROM npm_user;
+DROP ROLE IF EXISTS npm_user;

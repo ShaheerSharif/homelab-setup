@@ -13,7 +13,7 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_DB=${POSTGRES_DB:-postgres}
-      - TZ=${POSTGRES_TZ:-Asia/Karachi}
+      - TZ=${TZ}
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
     secrets:
       - postgres_password
@@ -22,7 +22,6 @@ services:
       - postgres_data:/var/lib/postgresql
     networks:
       - internal-net
-      - external-net
 
   # Migration services
   migrate:
@@ -70,21 +69,38 @@ services:
     ports:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"
+      - "${ADMIN_PORT:-81}:81"
     restart: unless-stopped
     environment:
-      - NGINX_HOST=${NGINX_HOST}
+      # - NGINX_HOST=${NGINX_HOST}
+      - TZ=${TZ}
+      # Postgres parameters:
+      - DB_POSTGRES_HOST=postgres
+      - DB_POSTGRES_PORT=5432
+      - DB_POSTGRES_USER=npm_user
+      - DB_POSTGRES_PASSWORD=npmpass
+      - DB_POSTGRES_NAME=npm_db
+      # Uncomment this if IPv6 is not enabled on your host
+      - DISABLE_IPV6=true
+      # Disable IP range fetch from Cloudflare and Cloudfront
+      - IP_RANGES_FETCH_ENABLED=false
     volumes:
-      - ./config/nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./config/nginx/snippets:/etc/nginx/snippets:ro
-      - ./config/nginx/certs:/etc/nginx/certs:ro
-      - ./config/nginx/vhost.d:/etc/nginx/vhost.d:ro
-      - ./config/nginx/htpasswd:/etc/nginx/htpasswd:ro
+      # - ./config/nginx/conf.d:/etc/nginx/conf.d:ro
+      # - ./config/nginx/snippets:/etc/nginx/snippets:ro
+      # - ./config/nginx/certs:/etc/nginx/certs:ro
+      # - ./config/nginx/vhost.d:/etc/nginx/vhost.d:ro
+      # - ./config/nginx/htpasswd:/etc/nginx/htpasswd:ro
 
-      - ./html:/usr/share/nginx/html:ro
+      # - ./nginx/html:/usr/share/nginx/html:ro
+
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
     networks:
       - internal-net
       - external-net
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       paperless:
         condition: service_started
         required: false
@@ -124,8 +140,6 @@ services:
     networks:
       - internal-net
     depends_on:
-      postgres:
-        condition: service_healthy
       migrate:
         condition: service_completed_successfully
       valkey:

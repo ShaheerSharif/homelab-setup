@@ -1,0 +1,35 @@
+# ------------------------------------------------------------
+# 5432 TCP: true UDP: true
+# ------------------------------------------------------------
+
+
+server {
+  listen 5432 reuseport;
+  #listen [::]:5432 reuseport;
+
+  proxy_pass postgres.homelab.internal:5432;
+
+  access_log /data/logs/stream-1_access.log stream;
+  error_log /data/logs/stream-1_error.log warn;
+
+  # Custom
+  include /data/nginx/custom/server_stream[.]conf;
+  include /data/nginx/custom/server_stream_tcp[.]conf;
+}
+
+
+server {
+  listen 5432 udp reuseport;
+  #listen [::]:5432 udp reuseport;
+
+  proxy_pass postgres.homelab.internal:5432;
+
+  access_log /data/logs/stream-1_access.log stream;
+  error_log /data/logs/stream-1_error.log warn;
+
+  # Custom
+  include /data/nginx/custom/server_stream[.]conf;
+  include /data/nginx/custom/server_stream_udp[.]conf;
+}
+
+

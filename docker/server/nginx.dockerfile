@@ -1,9 +1,1 @@
-FROM dhi.io/nginx:1
-
-ARG NGINX_HOST
-
-ENV NGINX_HOST=${NGINX_HOST}
-ENV NGINX_PORT=80
-
-EXPOSE 80
-EXPOSE 443
+FROM jc21/nginx-proxy-manager:2.16.0

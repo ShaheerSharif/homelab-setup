@@ -6,6 +6,14 @@
 secrets/*.conf
 !secrets/*.example.conf
 
+# NGINX
+nginx/data/access
+nginx/data/custom_ssl
+nginx/data/letsencrypt-acme-challenge
+nginx/data/logs
+nginx/data/temp
+nginx/data/keys.json
+
 # Paperless
 paperless/consume/
 paperless/export/
