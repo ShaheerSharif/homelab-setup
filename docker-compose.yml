@@ -109,10 +109,31 @@ services:
       dockerfile: docker/services/paperless-ngx.dockerfile
     restart: unless-stopped
     environment:
+      - LANG=en_US.UTF-8
+      - PAPERLESS_USERMAP_UID=1000
+      - PAPERLESS_USERMAP_GID=1000
+
+      # Web server config
       - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
       - PAPERLESS_REDIS_FILE=/run/secrets/valkey_url
       - PAPERLESS_URL=http://paperless.${NGINX_HOST}
       - PAPERLESS_CSRF_TRUSTED_ORIGINS=http://paperless.${NGINX_HOST}:${HTTP_PORT:-80},https://paperless.${NGINX_HOST}:${HTTPS_PORT:-443}
+      - PAPERLESS_USE_X_FORWARD_HOST=true
+      - PAPERLESS_USE_X_FORWARD_PORT=true
+      - PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
+
+      # Tika Config
+      - PAPERLESS_TIKA_ENABLED=1
+      - PAPERLESS_TIKA_GOTENBERG_ENDPOINT="http://gotenberg:3000"
+      - PAPERLESS_TIKA_ENDPOINT="http://tika:9998"
+
+      # DB Config
+      - PAPERLESS_DBENGINE=postgresql
+      - PAPERLESS_DBHOST=postgres
+      # TODO: pass these credentials securely
+      - PAPERLESS_DBNAME=paperless_db
+      - PAPERLESS_DBUSER=paperless_user
+      - PAPERLESS_DBPASS=paperless
     secrets:
       - paperless_secret_key
       - valkey_url
