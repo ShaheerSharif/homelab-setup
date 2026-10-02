@@ -13,7 +13,7 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_DB=${POSTGRES_DB:-postgres}
-      - TZ=${POSTGRES_TZ:-Asia/Karachi}
+      - TZ=${TZ:-Asia/Karachi}
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
     secrets:
       - postgres_password
@@ -110,8 +110,8 @@ services:
     restart: unless-stopped
     environment:
       - LANG=en_US.UTF-8
-      - PAPERLESS_USERMAP_UID=1000
-      - PAPERLESS_USERMAP_GID=1000
+      - PAPERLESS_USERMAP_UID=${UID:-1000}
+      - PAPERLESS_USERMAP_GID=${GID:-1000}
 
       # Web server config
       - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
