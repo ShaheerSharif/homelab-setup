@@ -86,7 +86,13 @@ services:
       - external-net
     depends_on:
       paperless:
-        condition: service_started
+        condition: service_healthy
+        required: false
+      authentik:
+        condition: service_healthy
+        required: false
+      authentik-worker:
+        condition: service_healthy
         required: false
 
   # Utility services
@@ -105,6 +111,27 @@ services:
     restart: unless-stopped
     networks:
       - internal-net
+
+  socket-proxy:
+    build:
+      context: .
+      dockerfile: docker/utils/socket-proxy.dockerfile
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /run
+    environment:
+      - CONTAINERS=1
+      - IMAGES=1
+      - NETWORKS=1
+      - POST=1
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - socket-proxy-net
 
   # Services
   paperless:
@@ -160,6 +187,58 @@ services:
       tika:
         condition: service_started
 
+  authentik:
+    build:
+      context: .
+      dockerfile: docker/sso/authentik.dockerfile
+    restart: unless-stopped
+    shm_size: 512mb
+    environment:
+      - AUTHENTIK_POSTGRESQL__HOST=postgres
+      - AUTHENTIK_POSTGRESQL__NAME=authentik_db
+      - AUTHENTIK_POSTGRESQL__PASSWORD=authentik
+      - AUTHENTIK_POSTGRESQL__USER=authentik_user
+      - AUTHENTIK_SECRET_KEY=file:///run/secrets/authentik_secret_key
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING__ENABLED:-false}
+    secrets:
+      - authentik_secret_key
+    volumes:
+    - ./config/authentik/data:/data
+    - ./config/authentik/custom-templates:/templates
+    networks:
+      - internal-net
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  authentik-worker:
+    build:
+      context: .
+      dockerfile: docker/sso/authentik-worker.dockerfile
+    restart: unless-stopped
+    shm_size: 512mb
+    environment:
+      - AUTHENTIK_POSTGRESQL__HOST=postgres
+      - AUTHENTIK_POSTGRESQL__NAME=authentik_db
+      - AUTHENTIK_POSTGRESQL__PASSWORD=authentik
+      - AUTHENTIK_POSTGRESQL__USER=authentik_user
+      - AUTHENTIK_SECRET_KEY=file:///run/secrets/authentik_secret_key
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING__ENABLED:-false}
+    secrets:
+      - authentik_secret_key
+    volumes:
+      - ./config/authentik/data:/data
+      - ./config/authentik/certs:/certs
+      - ./config/authentik/custom-templates:/templates
+    networks:
+      - internal-net
+      - socket-proxy-net
+    depends_on:
+      authentik:
+        condition: service_healthy
+      socket-proxy:
+        condition: service_started
+
 
 volumes:
   postgres_data:
@@ -176,6 +255,10 @@ networks:
   external-net:
     driver: bridge
 
+  socket-proxy-net:
+    driver: bridge
+    internal: true
+
 
 secrets:
   postgres_password:
@@ -186,3 +269,5 @@ secrets:
     environment: VALKEY_URL
   paperless_secret_key:
     environment: PAPERLESS_SECRET_KEY
+  authentik_secret_key:
+    environment: AUTHENTIK_SECRET_KEY

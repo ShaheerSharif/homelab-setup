@@ -9,3 +9,7 @@ secrets/*.conf
 # Paperless
 paperless/consume/
 paperless/export/
+
+# Authentik
+config/authentik/certs/*
+!config/authentik/certs/.gitkeep
