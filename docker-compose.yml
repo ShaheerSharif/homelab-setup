@@ -118,8 +118,16 @@ services:
       dockerfile: docker/utils/socket-proxy.dockerfile
     restart: unless-stopped
     read_only: true
+    cap_drop:
+      - ALL
+    # Need to add this if logs don't work
+    # cap_add:
+    #   - DAC_OVERRIDE
+    security_opt:
+      - no-new-privileges:true
     tmpfs:
       - /run
+      - /tmp
     environment:
       - CONTAINERS=1
       - IMAGES=1
