@@ -7,12 +7,15 @@ secrets/*.conf
 !secrets/*.example.conf
 
 # NGINX
-nginx/data/access
-nginx/data/custom_ssl
-nginx/data/letsencrypt-acme-challenge
-nginx/data/logs
-nginx/data/temp
-nginx/data/keys.json
+config/nginx-proxy-manager/data/access
+config/nginx-proxy-manager/data/custom_ssl
+config/nginx-proxy-manager/data/letsencrypt-acme-challenge
+config/nginx-proxy-manager/data/logs
+config/nginx-proxy-manager/data/temp
+config/nginx-proxy-manager/data/keys.json
+
+config/nginx-proxy-manager/letsencrypt/*
+!config/nginx-proxy-manager/letsencrypt/.gitkeep
 
 # Paperless
 paperless/consume/
