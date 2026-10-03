@@ -120,9 +120,6 @@ services:
     read_only: true
     cap_drop:
       - ALL
-    # Need to add this if logs don't work
-    # cap_add:
-    #   - DAC_OVERRIDE
     security_opt:
       - no-new-privileges:true
     tmpfs:
@@ -151,6 +148,8 @@ services:
       - LANG=en_US.UTF-8
       - PAPERLESS_USERMAP_UID=${UID:-1000}
       - PAPERLESS_USERMAP_GID=${GID:-1000}
+      - PAPERLESS_OCR_LANGUAGE=${PAPERLESS_OCR_LANGUAGE:-eng}
+      - PAPERLESS_OCR_LANGUAGES=${PAPERLESS_OCR_LANGUAGES:-deu}
 
       # Web server config
       - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
