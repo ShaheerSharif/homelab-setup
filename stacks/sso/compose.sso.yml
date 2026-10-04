@@ -1,0 +1,69 @@
+services:
+  authentik:
+    build:
+      context: .
+      dockerfile: docker/authentik.dockerfile
+    restart: unless-stopped
+    shm_size: 512mb
+    environment:
+      - AUTHENTIK_POSTGRESQL__HOST=postgres
+      - AUTHENTIK_POSTGRESQL__NAME=authentik_db
+      - AUTHENTIK_POSTGRESQL__PASSWORD=authentik
+      - AUTHENTIK_POSTGRESQL__USER=authentik_user
+      - AUTHENTIK_SECRET_KEY=file:///run/secrets/authentik_secret_key
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING__ENABLED:-false}
+    secrets:
+      - authentik_secret_key
+    volumes:
+    - ./authentik/data:/data
+    - ./authentik/custom-templates:/templates
+    networks:
+      - postgres-net
+      - internal-net
+
+  authentik-worker:
+    build:
+      context: .
+      dockerfile: docker/authentik-worker.dockerfile
+    restart: unless-stopped
+    shm_size: 512mb
+    environment:
+      - AUTHENTIK_POSTGRESQL__HOST=postgres
+      - AUTHENTIK_POSTGRESQL__NAME=authentik_db
+      - AUTHENTIK_POSTGRESQL__PASSWORD=authentik
+      - AUTHENTIK_POSTGRESQL__USER=authentik_user
+      - AUTHENTIK_SECRET_KEY=file:///run/secrets/authentik_secret_key
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING__ENABLED:-false}
+    secrets:
+      - authentik_secret_key
+    volumes:
+      - ./authentik/data:/data
+      - ./authentik/certs:/certs
+      - ./authentik/custom-templates:/templates
+    networks:
+      - postgres-net
+      - internal-net
+      - socket-proxy-net
+
+networks:
+  postgres-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_postgres-net
+
+  internal-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_internal-net
+
+  socket-proxy-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_socket-proxy-net
+
+secrets:
+  authentik_secret_key:
+    environment: AUTHENTIK_SECRET_KEY

@@ -7,9 +7,8 @@ secrets/*.conf
 !secrets/*.example.conf
 
 # Paperless
-paperless/consume/
-paperless/export/
+stacks/paperless-ngx/data
 
 # Authentik
-config/authentik/certs/*
-!config/authentik/certs/.gitkeep
+stacks/sso/authentik/certs/*
+!stacks/sso/authentik/certs/.gitkeep

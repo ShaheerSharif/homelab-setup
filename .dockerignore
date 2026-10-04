@@ -12,8 +12,5 @@
 # Documentation
 README.md
 
-# Docker files
-docker/
-
 # Secrets
 secrets/

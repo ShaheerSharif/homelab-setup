@@ -1,0 +1,26 @@
+services:
+  gotenberg:
+    build:
+      context: .
+      dockerfile: docker/gotenberg.dockerfile
+    container_name: homelab-gotenberg
+    restart: unless-stopped
+    networks:
+      - internal-net
+
+  tika:
+    build:
+      context: .
+      dockerfile: docker/apache-tika.dockerfile
+    container_name: homelab-apache-tika
+    restart: unless-stopped
+    networks:
+      - internal-net
+
+
+networks:
+  internal-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_internal-net

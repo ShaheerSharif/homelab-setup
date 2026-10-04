@@ -1,9 +1,5 @@
 FROM dhi.io/postgres:18-alpine3.23
 
-ENV POSTGRES_INITDB_ARGS='--encoding=UTF8'
-
-EXPOSE 5432
-
 HEALTHCHECK    \
     --interval=10s \
     --timeout=5s   \

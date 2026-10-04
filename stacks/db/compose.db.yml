@@ -1,0 +1,100 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: docker/postgres.dockerfile
+    container_name: homelab-postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - TZ=${TZ:-Asia/Karachi}
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8
+    secrets:
+      - postgres_password
+    volumes:
+      - ./config/postgresql:/etc/postgresql:ro
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - postgres-net
+      - external-net
+
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/dbmate.dockerfile
+    container_name: homelab-migrate
+    restart: "no"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - DBMATE_MIGRATIONS_DIR=/db/migrations
+      - DBMATE_NO_DUMP_SCHEMA=true
+    secrets:
+      - postgres_password
+    volumes:
+      - ./migrations:/db/migrations
+    networks:
+      - postgres-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  valkey:
+    build:
+      context: .
+      dockerfile: docker/valkey.dockerfile
+    container_name: homelab-valkey
+    ports:
+      - "${VALKEY_PORT:-6380}:6380"
+    restart: unless-stopped
+    secrets:
+      - valkey_password
+    volumes:
+      - ./config/valkey/valkey.conf:/usr/local/valkey/valkey.conf:ro
+      - valkey_data:/data
+    networks:
+      - valkey-net
+      - external-net
+
+
+volumes:
+  postgres_data:
+    name: homelab_postgres_data
+  valkey_data:
+    name: homelab_valkey_data
+
+
+networks:
+  postgres-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_postgres-net
+
+  valkey-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_valkey-net
+
+  internal-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_internal-net
+
+  external-net:
+    driver: bridge
+    external: true
+    name: homelab_external-net
+
+
+secrets:
+  postgres_password:
+    environment: POSTGRES_PASSWORD
+  valkey_password:
+    environment: VALKEY_PASSWORD
