@@ -51,4 +51,4 @@ This contains a list of all the stacks used and their dependencies.
 | `tika`            | `utils`                  | `docker.io/apache/tika:3.3.1.0`                |                                                      |
 | `autentik-worker` | `sso`                    | `ghcr.io/goauthentik/server:2026.8.3`          | `postgres`, `migrate`, `socket-proxy`                |
 | `autentik`        | `sso`                    | `ghcr.io/goauthentik/server:2026.8.3`          | `postgres`, `migrate`                                |
-| `paperless`       | `services/paperless-ngx` | `ghcr.io/goauthentik/server:2026.8.3`          | `postgres`, `migrate`, `valkey`, `tika`, `gotenberg` |
+| `paperless`       | `services/paperless-ngx` | `ghcr.io/paperless-ngx/paperless-ngx:latest`   | `postgres`, `migrate`, `valkey`, `tika`, `gotenberg` |
