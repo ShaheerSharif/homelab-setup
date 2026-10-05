@@ -41,11 +41,14 @@ up_optional "$STACKS/socket-proxy/compose.socket-proxy.yml"
 # 3. Utils (tika, gotenberg)
 up_optional "$STACKS/utils/compose.utils.yml"
 
-# 4. Services, any order, failures tolerated
-for f in "$STACKS"/sso/compose.*.yml "$STACKS"/services/*/compose.*.yml; do
+# 4. SSO (authentik)
+up_optional "$STACKS/sso/compose.sso.yml"
+
+# 5. Services, any order, failures tolerated
+for f in "$STACKS"/services/*/compose.*.yml; do
   [[ -f $f ]] || continue
   up_optional "$f"
 done
 
-# 5. nginx last
+# 6. nginx last
 up_optional "$STACKS/server/compose.server.yml"

@@ -55,21 +55,24 @@ down() {
 # 1. nginx
 down "$STACKS/server/compose.server.yml"
 
-# 2. Services
-for f in "$STACKS"/sso/compose.*.yml "$STACKS"/services/*/compose.*.yml; do
+# 2. SSO (authentik)
+down "$STACKS/sso/compose.sso.yml"
+
+# 3. Services
+for f in "$STACKS"/services/*/compose.*.yml; do
   down "$f"
 done
 
-# 3. Utils
+# 4. Utils
 down "$STACKS/utils/compose.utils.yml"
 
-# 4. Socket proxy
+# 5. Socket proxy
 down "$STACKS/socket-proxy/compose.socket-proxy.yml"
 
-# 5. Databases last
+# 6. Databases last
 down "$STACKS/db/compose.db.yml"
 
-# 6. Shared networks (created by start.sh, external in the compose files, so
+# 7. Shared networks (created by start.sh, external in the compose files, so
 #    `down` doesn't remove them). Fails harmlessly if something is still attached.
 for n in homelab_postgres-net homelab_valkey-net homelab_internal-net \
          homelab_socket-proxy-net homelab_external-net; do
