@@ -1,6 +1,6 @@
 FROM ghcr.io/goauthentik/server:2026.8.3
 
-COPY --chmod=755 stacks/sso/scripts/authentik-healthcheck.sh /usr/local/bin/healthcheck.sh
+COPY --chmod=755 scripts/authentik-healthcheck.sh /usr/local/bin/healthcheck.sh
 
 CMD [ "server" ]
 
