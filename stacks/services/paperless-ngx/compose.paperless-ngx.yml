@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/paperless-ngx.dockerfile
+    container_name: homelab-paperless
     restart: unless-stopped
     environment:
       - LANG=en_US.UTF-8

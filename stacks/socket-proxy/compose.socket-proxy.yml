@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/socket-proxy.dockerfile
+    container_name: homelab-socket-proxy
     restart: unless-stopped
     read_only: true
     cap_drop:

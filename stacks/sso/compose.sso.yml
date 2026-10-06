@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/authentik.dockerfile
+    container_name: homelab-authentik
     restart: unless-stopped
     shm_size: 512mb
     environment:
@@ -25,6 +26,7 @@ services:
     build:
       context: .
       dockerfile: docker/authentik-worker.dockerfile
+    container_name: homelab-authentik-worker
     restart: unless-stopped
     shm_size: 512mb
     environment:
