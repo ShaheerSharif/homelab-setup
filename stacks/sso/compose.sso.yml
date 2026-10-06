@@ -20,9 +20,6 @@ services:
     networks:
       - postgres-net
       - internal-net
-    depends_on:
-      authentik-worker:
-        condition: service_healthy
 
   authentik-worker:
     build:
