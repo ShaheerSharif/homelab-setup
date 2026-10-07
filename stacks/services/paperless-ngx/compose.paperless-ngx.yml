@@ -11,6 +11,8 @@ services:
       - PAPERLESS_USERMAP_GID=${GID:-1000}
       - PAPERLESS_OCR_LANGUAGE=${PAPERLESS_OCR_LANGUAGE:-eng}
       - PAPERLESS_OCR_LANGUAGES=${PAPERLESS_OCR_LANGUAGES:-deu}
+      - PAPERLESS_EMPTY_TRASH_DIR=./data/trash
+      - PAPERLESS_FILENAME_FORMAT={{ owner_username }}/{{ created_year }}/{{ correspondent }}/{{ doc_pk }}-{{ title }}
 
       # Web server config
       - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
