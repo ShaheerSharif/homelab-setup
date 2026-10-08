@@ -65,7 +65,9 @@ dc "$DB" up -d --wait postgres valkey
 dc "$DB" run --rm migrate
 
 # 2. Socket proxy
-up_optional "$STACKS/socket-proxy/compose.socket-proxy.yml"
+SOCKET_PROXY="$STACKS/socket-proxy/compose.socket-proxy.yml"
+build_stack "$SOCKET_PROXY"
+dc "$SOCKET_PROXY" up -d --wait socket-proxy
 
 # 3. Utils (tika, gotenberg)
 up_optional "$STACKS/utils/compose.utils.yml"
