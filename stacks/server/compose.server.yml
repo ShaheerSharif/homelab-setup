@@ -22,7 +22,7 @@ services:
       - --api.dashboard=true  # Not exposed until a router is set for this
 
       # Router for dashboard
-      - traefik.http.routers.dashboard.rule=Host(`traefik.${NGINX_HOST:?nginx host is required}`)
+      - traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN:?base domain is required}`)
       - traefik.http.routers.dashboard.entrypoints=web
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.routers.dashboard.middlewares=dashboard-auth
