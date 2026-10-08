@@ -54,15 +54,19 @@ services:
       # Default router: no-referrer everywhere
       - traefik.http.routers.paperless.rule=Host(`paperless.${DOMAIN:?base domain is required}`)
       - traefik.http.routers.paperless.entrypoints=web
-      - traefik.http.routers.paperless.service=paperless
-      - traefik.http.routers.paperless.middlewares=paperless-referrer-strict
+      # - traefik.http.routers.paperless.service=paperless
+      # - traefik.http.routers.paperless.middlewares=paperless-referrer-strict
+      - traefik.http.routers.paperless.middlewares=paperless-referrer
       - traefik.http.services.paperless.loadbalancer.server.port=8000
+
+      # same-origin: Django's CSRF check gets a real Origin header (not "null")
+      - traefik.http.middlewares.paperless-referrer.headers.referrerpolicy=same-origin
 
       # Login/signup router: same-origin so Django's CSRF check gets a real Origin
       - traefik.http.routers.paperless-login.rule=Host(`paperless.${DOMAIN:?base domain is required}`) && PathRegexp(`^/accounts/(signup|login)/`)
       - traefik.http.routers.paperless-login.priority=100
       - traefik.http.routers.paperless-login.entrypoints=web
-      - traefik.http.routers.paperless-login.service=paperless
+      # - traefik.http.routers.paperless-login.service=paperless
       - traefik.http.routers.paperless-login.middlewares=paperless-referrer-login
 
       - traefik.http.middlewares.paperless-referrer-strict.headers.referrerpolicy=no-referrer
