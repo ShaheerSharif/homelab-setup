@@ -52,7 +52,7 @@ down() {
 
 # Reverse of start order
 
-# 1. nginx
+# 1. traefik
 down "$STACKS/server/compose.server.yml"
 
 # 2. SSO (authentik)
