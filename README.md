@@ -42,7 +42,6 @@ This contains a list of all the stacks used and their dependencies.
 
 | Service name      | Stack name               | Image                                          | Depends on service                                   |
 | ----------------- | ------------------------ | ---------------------------------------------- | ---------------------------------------------------- |
-| `nginx`           | `server`                 | `dhi.io/nginx:1`                               |                                                      |
 | `postgres`        | `db`                     | `dhi.io/postgres:18-alpine3.23`                |                                                      |
 | `valkey`          | `db`                     | `dhi.io/valkey:9`                              |                                                      |
 | `migrate`         | `db`                     | `ghcr.io/amacneil/dbmate:2`                    | `postgres`                                           |
@@ -52,3 +51,4 @@ This contains a list of all the stacks used and their dependencies.
 | `autentik-worker` | `sso`                    | `ghcr.io/goauthentik/server:2026.8.3`          | `postgres`, `migrate`, `socket-proxy`                |
 | `autentik`        | `sso`                    | `ghcr.io/goauthentik/server:2026.8.3`          | `postgres`, `migrate`, `authentik-worker`            |
 | `paperless`       | `services/paperless-ngx` | `ghcr.io/paperless-ngx/paperless-ngx:latest`   | `postgres`, `migrate`, `valkey`, `tika`, `gotenberg` |
+| `traefik`         | `server`                 | `dhi.io/traefik:3-debian-dev`                  | `socket-proxy`                                       |
