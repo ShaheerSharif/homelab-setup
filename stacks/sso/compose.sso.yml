@@ -18,7 +18,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=homelab_internal-net
-      - traefik.http.routers.authentik.rule=Host(`authentik.${NGINX_HOST:?nginx host is required}`)
+      - traefik.http.routers.authentik.rule=Host(`authentik.${DOMAIN:?nginx host is required}`)
       - traefik.http.routers.authentik.entrypoints=web
       - traefik.http.services.authentik.loadbalancer.server.port=9000
     volumes:

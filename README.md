@@ -7,7 +7,7 @@ This is a homelab setup deployed as stacks to ensure modularity with shared depe
 Copy `.env.example` to `.env`. These values are **required**. Without these the compose files won't execute.
 
 ```
-NGINX_HOST=your-site.com
+DOMAIN=your-site.com
 POSTGRES_PASSWORD=my-secret-password
 VALKEY_PASSWORD=myLargeAlphaNumericPassword
 PAPERLESS_SECRET_KEY=my-secret-key
