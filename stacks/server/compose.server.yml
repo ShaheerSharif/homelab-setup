@@ -14,7 +14,7 @@ services:
 
       # Entrypoints
       - --entrypoints.web.address=:80
-      # - --entrypoints.websecure.address=:443  # Enable once https is set
+      - --entrypoints.websecure.address=:443
 
       # Health and logging
       - --ping=true
