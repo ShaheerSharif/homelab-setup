@@ -15,6 +15,12 @@ services:
       - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING__ENABLED:-false}
     secrets:
       - authentik_secret_key
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=homelab_internal-net
+      - traefik.http.routers.authentik.rule=Host(`authentik.${NGINX_HOST:?nginx host is required}`)
+      - traefik.http.routers.authentik.entrypoints=web
+      - traefik.http.services.authentik.loadbalancer.server.port=9000
     volumes:
     - ./authentik/data:/data
     - ./authentik/custom-templates:/templates

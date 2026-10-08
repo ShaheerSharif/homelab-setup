@@ -37,6 +37,26 @@ services:
     secrets:
       - paperless_secret_key
       - valkey_url
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=homelab_internal-net
+
+      # Default router: no-referrer everywhere
+      - traefik.http.routers.paperless.rule=Host(`paperless.${NGINX_HOST:?nginx host is required}`)
+      - traefik.http.routers.paperless.entrypoints=web
+      - traefik.http.routers.paperless.service=paperless
+      - traefik.http.routers.paperless.middlewares=paperless-referrer-strict
+      - traefik.http.services.paperless.loadbalancer.server.port=8000
+
+      # Login/signup router: same-origin so Django's CSRF check gets a real Origin
+      - traefik.http.routers.paperless-login.rule=Host(`paperless.${NGINX_HOST:?nginx host is required}`) && PathRegexp(`^/accounts/(signup|login)/`)
+      - traefik.http.routers.paperless-login.priority=100
+      - traefik.http.routers.paperless-login.entrypoints=web
+      - traefik.http.routers.paperless-login.service=paperless
+      - traefik.http.routers.paperless-login.middlewares=paperless-referrer-login
+
+      - traefik.http.middlewares.paperless-referrer-strict.headers.referrerpolicy=no-referrer
+      - traefik.http.middlewares.paperless-referrer-login.headers.referrerpolicy=same-origin
     volumes:
       - paperless_data:/usr/src/paperless/data
       - paperless_media:/usr/src/paperless/media
