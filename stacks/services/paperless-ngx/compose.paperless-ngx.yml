@@ -16,8 +16,8 @@ services:
       # Web server config
       - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
       - PAPERLESS_REDIS_FILE=/run/secrets/valkey_url
-      - PAPERLESS_URL=http://paperless.${DOMAIN:?nginx host is required}
-      - PAPERLESS_CSRF_TRUSTED_ORIGINS=http://paperless.${DOMAIN:?nginx host is required}:${HTTP_PORT:-80},https://paperless.${DOMAIN:?nginx host is required}:${HTTPS_PORT:-443}
+      - PAPERLESS_URL=http://paperless.${DOMAIN:?base domain is required}
+      - PAPERLESS_CSRF_TRUSTED_ORIGINS=http://paperless.${DOMAIN:?base domain is required}:${HTTP_PORT:-80},https://paperless.${DOMAIN:?base domain is required}:${HTTPS_PORT:-443}
       - PAPERLESS_USE_X_FORWARD_HOST=true
       - PAPERLESS_USE_X_FORWARD_PORT=true
       - PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
@@ -42,14 +42,14 @@ services:
       - traefik.docker.network=homelab_internal-net
 
       # Default router: no-referrer everywhere
-      - traefik.http.routers.paperless.rule=Host(`paperless.${DOMAIN:?nginx host is required}`)
+      - traefik.http.routers.paperless.rule=Host(`paperless.${DOMAIN:?base domain is required}`)
       - traefik.http.routers.paperless.entrypoints=web
       - traefik.http.routers.paperless.service=paperless
       - traefik.http.routers.paperless.middlewares=paperless-referrer-strict
       - traefik.http.services.paperless.loadbalancer.server.port=8000
 
       # Login/signup router: same-origin so Django's CSRF check gets a real Origin
-      - traefik.http.routers.paperless-login.rule=Host(`paperless.${DOMAIN:?nginx host is required}`) && PathRegexp(`^/accounts/(signup|login)/`)
+      - traefik.http.routers.paperless-login.rule=Host(`paperless.${DOMAIN:?base domain is required}`) && PathRegexp(`^/accounts/(signup|login)/`)
       - traefik.http.routers.paperless-login.priority=100
       - traefik.http.routers.paperless-login.entrypoints=web
       - traefik.http.routers.paperless-login.service=paperless
