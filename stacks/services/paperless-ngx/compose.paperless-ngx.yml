@@ -16,7 +16,7 @@ services:
       # Web server config
       - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
       - PAPERLESS_REDIS_FILE=/run/secrets/valkey_url
-      - PAPERLESS_URL=http://paperless.${DOMAIN:?base domain is required}
+      - PAPERLESS_URL=http://paperless.${DOMAIN:?base domain is required}:${HTTP_PORT:-80}
       - PAPERLESS_CSRF_TRUSTED_ORIGINS=http://paperless.${DOMAIN:?base domain is required}:${HTTP_PORT:-80},https://paperless.${DOMAIN:?base domain is required}:${HTTPS_PORT:-443}
       - PAPERLESS_USE_X_FORWARD_HOST=true
       - PAPERLESS_USE_X_FORWARD_PORT=true
@@ -34,6 +34,16 @@ services:
       - PAPERLESS_DBNAME=paperless_db
       - PAPERLESS_DBUSER=paperless_user
       - PAPERLESS_DBPASS=paperless
+
+      # OIDC/OAuth2.0
+      - PAPERLESS_APPS=${PAPERLESS_APPS}
+      - PAPERLESS_SOCIALACCOUNT_PROVIDERS=${PAPERLESS_SOCIALACCOUNT_PROVIDERS}
+      - PAPERLESS_LOGOUT_REDIRECT_URL=${PAPERLESS_LOGOUT_REDIRECT_URL}
+      - PAPERLESS_SOCIAL_AUTO_SIGNUP=${PAPERLESS_SOCIAL_AUTO_SIGNUP}
+      - PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS=${PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS}
+      - PAPERLESS_DISABLE_REGULAR_LOGIN=${PAPERLESS_DISABLE_REGULAR_LOGIN}
+      - PAPERLESS_REDIRECT_LOGIN_TO_SSO=${PAPERLESS_REDIRECT_LOGIN_TO_SSO}
+      - PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL=${PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL}
     secrets:
       - paperless_secret_key
       - valkey_url
