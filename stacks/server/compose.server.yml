@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: docker/traefik.dockerfile
     container_name: homelab-traefik
+    restart: unless-stopped
     command:
       # Docker provider via socket-proxy
       - --providers.docker=true
@@ -20,6 +21,10 @@ services:
       - --log.level=INFO
       - --accesslog=true
       - --api.dashboard=true  # Not exposed until a router is set for this
+
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=homelab_internal-net
 
       # Router for dashboard
       - traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN:?base domain is required}`)
