@@ -60,7 +60,7 @@ Below is a list for each of the valid values that can be assigned in the .env fi
 ### Paperless
 
 - `PAPERLESS_OCR_MODE`
-  - `skip` _(default)_: OCR only pages with no text layer, and leave pages that already have text alone.
+  - `auto` _(default)_: detects whether a document already has embedded text via pdftotext. If sufficient text is found, OCR is skipped for that document (--skip-text). If no text is present, OCR runs normally. This is the safest option for mixed document collections.
   - `redo`: Re-OCR everything, replacing any existing text layer. It fails on files with signatures, and it’s slower.
   - `force`: Rasterize every page and OCR it, discarding existing text. It’s the heaviest option.
   - `skip_noarchive`: like `skip`, but doesn’t create an archived PDF/A copy when the original already has text. It saves disk space and processing. Newer releases may rename or add modes, so check the docs for your version.
