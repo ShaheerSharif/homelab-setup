@@ -12,6 +12,13 @@ services:
       - PAPERLESS_OCR_LANGUAGE=${PAPERLESS_OCR_LANGUAGE:-eng}
       - PAPERLESS_OCR_LANGUAGES=${PAPERLESS_OCR_LANGUAGES:-deu}
       - PAPERLESS_FILENAME_FORMAT={{ owner_username }}/{{ created_year }}/{{ correspondent }}/{{ doc_pk }}-{{ title }}
+      - PAPERLESS_TASK_WORKERS=${PAPERLESS_TASK_WORKERS:-1}
+      - PAPERLESS_THREADS_PER_WORKER=${PAPERLESS_THREADS_PER_WORKER:-1}
+      - PAPERLESS_WEBSERVER_WORKERS=${PAPERLESS_WEBSERVER_WORKERS:-1}
+      - PAPERLESS_OCR_MODE=${PAPERLESS_OCR_MODE:-skip}
+      - PAPERLESS_OCR_CLEAN=${PAPERLESS_OCR_CLEAN:-none}
+      - PAPERLESS_ENABLE_NLTK=${PAPERLESS_ENABLE_NLTK:-false}
+      - PAPERLESS_CONVERT_MEMORY_LIMIT=${PAPERLESS_CONVERT_MEMORY_LIMIT:-256MB}
 
       # Web server config
       - PAPERLESS_SECRET_KEY_FILE=/run/secrets/paperless_secret_key
@@ -71,6 +78,8 @@ services:
 
       - traefik.http.middlewares.paperless-referrer-strict.headers.referrerpolicy=no-referrer
       - traefik.http.middlewares.paperless-referrer-login.headers.referrerpolicy=same-origin
+    mem_limit: ${PAPERLESS_MEM_LIMIT:-2g}
+    memswap_limit: ${PAPERLESS_MEMSWAP_LIMIT:-3g}
     volumes:
       - paperless_data:/usr/src/paperless/data
       - paperless_media:/usr/src/paperless/media

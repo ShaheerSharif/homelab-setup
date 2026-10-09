@@ -21,6 +21,8 @@ services:
       - EVENTS=1
       - PING=1
       - VERSION=1
+    mem_limit: ${SOCKET_PROXY_MEM_LIMIT:-32m}
+    memswap_limit: ${SOCKET_PROXY_MEMSWAP_LIMIT:-64m}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:

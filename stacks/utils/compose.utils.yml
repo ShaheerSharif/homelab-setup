@@ -5,6 +5,8 @@ services:
       dockerfile: docker/gotenberg.dockerfile
     container_name: homelab-gotenberg
     restart: unless-stopped
+    mem_limit: ${GOTENBERG_MEM_LIMIT:-768m}
+    memswap_limit: ${GOTENBERG_MEMSWAP_LIMIT:-1g}
     networks:
       - internal-net
 
@@ -14,6 +16,10 @@ services:
       dockerfile: docker/apache-tika.dockerfile
     container_name: homelab-apache-tika
     restart: unless-stopped
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx384m"
+    mem_limit: ${TIKA_MEM_LIMIT:-512m}
+    memswap_limit: ${TIKA_MEMSWAP_LIMIT:-768m}
     networks:
       - internal-net
 

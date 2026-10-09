@@ -7,6 +7,13 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     restart: unless-stopped
+    entrypoint: >
+      postgres
+      -c max_connections=${POSTGRES_MAX_CONNECTIONS:-100}
+      -c shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}
+      -c work_mem=${POSTGRES_WORK_MEM:-4MB}
+      -c maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}
+      -c effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-256MB}
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-admin}
       - POSTGRES_DB=${POSTGRES_DB:-postgres}
@@ -15,6 +22,8 @@ services:
       - POSTGRES_INITDB_ARGS=--encoding=UTF8
     secrets:
       - postgres_password
+    mem_limit: ${POSTGRES_MEM_LIMIT:-512m}
+    memswap_limit: ${POSTGRES_MEMSWAP_LIMIT:-768m}
     volumes:
       - ./config/postgresql:/etc/postgresql:ro
       - postgres_data:/var/lib/postgresql
@@ -35,6 +44,8 @@ services:
       - DBMATE_NO_DUMP_SCHEMA=true
     secrets:
       - postgres_password
+    mem_limit: ${MIGRATE_MEM_LIMIT:-128m}
+    memswap_limit: ${MIGRATE_MEMSWAP_LIMIT:-192m}
     volumes:
       - ./migrations:/db/migrations
     networks:
@@ -53,6 +64,8 @@ services:
     restart: unless-stopped
     secrets:
       - valkey_password
+    mem_limit: ${VALKEY_MEM_LIMIT:-128m}
+    memswap_limit: ${VALKEY_MEMSWAP_LIMIT:-192m}
     volumes:
       - ./config/valkey/valkey.conf:/usr/local/valkey/valkey.conf:ro
       - valkey_data:/data
