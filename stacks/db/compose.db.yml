@@ -7,8 +7,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     restart: unless-stopped
-    entrypoint: >
-      postgres
+    command: >
       -c max_connections=${POSTGRES_MAX_CONNECTIONS:-100}
       -c shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}
       -c work_mem=${POSTGRES_WORK_MEM:-4MB}
