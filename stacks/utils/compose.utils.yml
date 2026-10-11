@@ -5,6 +5,8 @@ services:
       dockerfile: docker/gotenberg.dockerfile
     container_name: homelab-gotenberg
     restart: unless-stopped
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     mem_limit: ${GOTENBERG_MEM_LIMIT:-768m}
     memswap_limit: ${GOTENBERG_MEMSWAP_LIMIT:-1g}
     networks:
@@ -16,6 +18,8 @@ services:
       dockerfile: docker/apache-tika.dockerfile
     container_name: homelab-apache-tika
     restart: unless-stopped
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     environment:
       JAVA_TOOL_OPTIONS: "-Xmx384m"
     mem_limit: ${TIKA_MEM_LIMIT:-512m}

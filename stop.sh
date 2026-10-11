@@ -50,6 +50,11 @@ down() {
   dc "$f" down "${DOWN_FLAGS[@]}" || { echo "WARN: $f failed to go down" >&2; FAILED+=("$f"); }
 }
 
+remove_network() {
+  local n=$1;
+  docker network rm "$n" >/dev/null 2>&1 && echo ">> Removed network $n"
+}
+
 # Reverse of start order
 
 # 1. traefik
@@ -74,10 +79,13 @@ down "$STACKS/db/compose.db.yml"
 
 # 7. Shared networks (created by start.sh, external in the compose files, so
 #    `down` doesn't remove them). Fails harmlessly if something is still attached.
-for n in homelab_postgres-net homelab_valkey-net homelab_internal-net \
-         homelab_socket-proxy-net homelab_external-net; do
-  docker network rm "$n" >/dev/null 2>&1 && echo ">> Removed network $n"
-done
+remove_network homelab_postgres-net
+remove_network homelab_valkey-net
+remove_network homelab_socket-proxy-sso-net
+remove_network homelab_socket-proxy-server-net
+remove_network homelab_socket-proxy-monitor-net
+remove_network homelab_internal-net
+remove_network homelab_external-net
 
 if ((${#FAILED[@]})); then
   echo "Finished with failures:" >&2

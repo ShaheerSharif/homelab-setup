@@ -1,0 +1,86 @@
+services:
+  socket-proxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:v0.5.0
+    container_name: homelab-dozzle-socket-proxy
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /run
+      - /tmp
+    environment:
+      - CONTAINERS=1
+      - INFO=1
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
+    mem_limit: ${DOZZLE__SOCKET_PROXY_MEM_LIMIT:-32m}
+    memswap_limit: ${DOZZLE__SOCKET_PROXY_MEMSWAP_LIMIT:-64m}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - socket-proxy-net
+
+  dozzle:
+    build:
+      context: .
+      dockerfile: docker/dozzle.dockerfile
+    container_name: homelab-dozzle
+    environment:
+      - DOZZLE_FILTER=label=dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
+      - DOZZLE_REMOTE_HOST=tcp://socket-proxy:2375
+
+      - DOZZLE_AUTH_PROVIDER=${DOZZLE_AUTH_PROVIDER:-none}
+      - DOZZLE_AUTH_OIDC_ISSUER=${DOZZLE_AUTH_OIDC_ISSUER}
+      - DOZZLE_AUTH_OIDC_CLIENT_ID=${DOZZLE_AUTH_OIDC_CLIENT_ID}
+      - DOZZLE_AUTH_OIDC_CLIENT_SECRET_FILE=/run/secrets/dozzle_auth_oidc_client_secret
+      - DOZZLE_AUTH_OIDC_NAME=Authentik
+      - DOZZLE_AUTH_OIDC_SCOPES=${DOZZLE_AUTH_OIDC_SCOPES:-openid,profile,email,dozzle_roles}
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
+
+      - traefik.enable=true
+      - traefik.docker.network=homelab_internal-net
+      - traefik.http.routers.dozzle.rule=Host(`dozzle.${DOMAIN:?base domain is required}`)
+      - traefik.http.routers.dozzle.entrypoints=web
+      # - traefik.http.routers.dozzle.entrypoints=websecure
+      # - traefik.http.routers.dozzle.tls.certresolver=letsencrypt
+      - traefik.http.routers.dozzle.middlewares=middlewares-compress@docker
+      - traefik.http.middlewares.middlewares-compress.compress.excludedcontenttypes=text/event-stream
+      - traefik.http.services.dozzle.loadbalancer.server.port=8080
+    secrets:
+      - dozzle_auth_oidc_client_secret
+    volumes:
+      - dozzle_data:/data
+    networks:
+      - internal-net
+      - socket-proxy-net
+    depends_on:
+      socket-proxy:
+        condition: service_started
+
+volumes:
+  dozzle_data:
+    name: homelab_dozzle_data
+
+networks:
+  internal-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_internal-net
+
+  socket-proxy-net:
+    driver: bridge
+    external: true
+    internal: true
+    name: homelab_socket-proxy-monitor-net
+
+secrets:
+  dozzle_auth_oidc_client_secret:
+    environment: DOZZLE_AUTH_OIDC_CLIENT_SECRET

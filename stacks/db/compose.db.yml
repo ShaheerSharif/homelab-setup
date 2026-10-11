@@ -19,6 +19,8 @@ services:
       - TZ=${TZ:-Asia/Karachi}
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
       - POSTGRES_INITDB_ARGS=--encoding=UTF8
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     secrets:
       - postgres_password
     mem_limit: ${POSTGRES_MEM_LIMIT:-512m}
@@ -41,6 +43,8 @@ services:
       - POSTGRES_DB=${POSTGRES_DB:-postgres}
       - DBMATE_MIGRATIONS_DIR=/db/migrations
       - DBMATE_NO_DUMP_SCHEMA=true
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     secrets:
       - postgres_password
     mem_limit: ${MIGRATE_MEM_LIMIT:-128m}
@@ -61,6 +65,8 @@ services:
     ports:
       - "${VALKEY_PORT:-6380}:6380"
     restart: unless-stopped
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     secrets:
       - valkey_password
     mem_limit: ${VALKEY_MEM_LIMIT:-128m}

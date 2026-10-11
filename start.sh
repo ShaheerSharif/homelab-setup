@@ -54,8 +54,10 @@ ensure_network() {  # ensure_network <name> [extra create flags]
 # Shared networks (owned by this script, declared external in the compose files)
 ensure_network homelab_postgres-net --internal
 ensure_network homelab_valkey-net --internal
+ensure_network homelab_socket-proxy-sso-net --internal
+ensure_network homelab_socket-proxy-server-net --internal
+ensure_network homelab_socket-proxy-monitor-net --internal
 ensure_network homelab_internal-net --internal
-ensure_network homelab_socket-proxy-net --internal
 ensure_network homelab_external-net
 
 # 1. Databases: any failure aborts the whole script (set -e)
@@ -64,10 +66,10 @@ build_stack "$DB"
 dc "$DB" up -d --wait postgres valkey
 dc "$DB" run --rm migrate
 
-# 2. Socket proxy
-SOCKET_PROXY="$STACKS/socket-proxy/compose.socket-proxy.yml"
-build_stack "$SOCKET_PROXY"
-dc "$SOCKET_PROXY" up -d --wait socket-proxy
+# 2. Dozzle
+MONITOR="$STACKS/monitoring/compose.monitor.yml"
+build_stack "$MONITOR"
+dc "$MONITOR" up -d dozzle
 
 # 3. Utils (tika, gotenberg)
 up_optional "$STACKS/utils/compose.utils.yml"
@@ -81,5 +83,5 @@ for f in "$STACKS"/services/*/compose.*.yml; do
   up_optional "$f"
 done
 
-# 6. nginx last
+# 6. traefik last
 up_optional "$STACKS/server/compose.server.yml"

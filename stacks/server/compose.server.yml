@@ -1,4 +1,30 @@
 services:
+  socket-proxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:v0.5.0
+    container_name: homelab-traefik-socket-proxy
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /run
+      - /tmp
+    environment:
+      - CONTAINERS=1
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
+    mem_limit: ${TRAEFIK__SOCKET_PROXY_MEM_LIMIT:-32m}
+    memswap_limit: ${TRAEFIK__SOCKET_PROXY_MEMSWAP_LIMIT:-64m}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - socket-proxy-net
+
   traefik:
     build:
       context: .
@@ -32,6 +58,8 @@ services:
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.routers.dashboard.middlewares=dashboard-auth
       - traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_USERS:?dashboard credentials are required}
+
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     ports:
       - "${HTTP_PORT:-80}:${HTTP_PORT:-80}"
     security_opt:
@@ -44,8 +72,12 @@ services:
         aliases:
           - authentik.${DOMAIN:?base domain is required}
           - paperless.${DOMAIN:?base domain is required}
+          - dozzle.${DOMAIN:?base domain is required}
       external-net:
       socket-proxy-net:
+    depends_on:
+      socket-proxy:
+        condition: service_started
 
 
 networks:
@@ -64,4 +96,4 @@ networks:
     driver: bridge
     external: true
     internal: true
-    name: homelab_socket-proxy-net
+    name: homelab_socket-proxy-server-net

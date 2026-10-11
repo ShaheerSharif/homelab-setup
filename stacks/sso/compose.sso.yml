@@ -1,4 +1,34 @@
 services:
+  socket-proxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:v0.5.0
+    container_name: homelab-authentik-socket-proxy
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /run
+      - /tmp
+    environment:
+      - CONTAINERS=1
+      - INFO=1
+      - IMAGES=1
+      - NETWORKS=1
+      - POST=1
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
+    mem_limit: ${AUTHENTIK__SOCKET_PROXY_MEM_LIMIT:-32m}
+    memswap_limit: ${AUTHENTIK__SOCKET_PROXY_MEMSWAP_LIMIT:-64m}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - socket-proxy-net
+
   authentik:
     build:
       context: .
@@ -24,6 +54,8 @@ services:
       - traefik.http.routers.authentik.rule=Host(`authentik.${DOMAIN:?base domain is required}`)
       - traefik.http.routers.authentik.entrypoints=web
       - traefik.http.services.authentik.loadbalancer.server.port=9000
+
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     mem_limit: ${AUTHENTIK_WEB__MEM_LIMIT:-768m}
     memswap_limit: ${AUTHENTIK_WEB__MEMSWAP_LIMIT:-1g}
     volumes:
@@ -49,6 +81,8 @@ services:
       - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING__ENABLED:-false}
       - AUTHENTIK_WORKER__PROCESSES=${AUTHENTIK_WORKER__PROCESSES:-1}
       - AUTHENTIK_WORKER__THREADS=${AUTHENTIK_WORKER__THREADS:-2}
+    labels:
+      - dev.dozzle.group=${DOZZLE_GROUP_LABEL:?group label is required}
     secrets:
       - authentik_secret_key
     mem_limit: ${AUTHENTIK_WORKER__MEM_LIMIT:-768m}
@@ -61,6 +95,9 @@ services:
       - postgres-net
       - internal-net
       - socket-proxy-net
+    depends_on:
+      socket-proxy:
+        condition: service_started
 
 networks:
   postgres-net:
@@ -79,7 +116,7 @@ networks:
     driver: bridge
     external: true
     internal: true
-    name: homelab_socket-proxy-net
+    name: homelab_socket-proxy-sso-net
 
 secrets:
   authentik_secret_key:
