@@ -1,5 +1,5 @@
 services:
-  socket-proxy:
+  traefik-socket-proxy:
     image: ghcr.io/tecnativa/docker-socket-proxy:v0.5.0
     container_name: homelab-traefik-socket-proxy
     restart: unless-stopped
